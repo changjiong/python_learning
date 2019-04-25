@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.template.loader import render_to_string
 
 # Create your models here.
 
@@ -25,7 +26,7 @@ class Link(models.Model):
         verbose_name = verbose_name_plural = "友链"
     
     def __str__(self):
-        return self.name
+        return self.title
  
 
 class SideBar(models.Model):
@@ -59,4 +60,34 @@ class SideBar(models.Model):
         verbose_name = verbose_name_plural = "侧边栏"
     
     def __str__(self):
-        return self.name
+        return self.title
+
+    @classmethod
+    def get_all(cls):
+        return cls.objects.filter(status=cls.STATUS_SHOW)
+
+    @property
+    def content_html(self):
+        """ 通过直接渲染模板 """
+        from bolg_rl.models import Post  # 避免循环引用
+        from comment.models import Comment
+
+        result = ''
+        if self.display_type == self.DISPLAY_HTML:
+            result = self.content
+        elif self.display_type == self.DISPLAY_LATEST:
+            context = {
+                'posts': Post.latest_posts()
+            }
+            result = render_to_string('config/blocks/sidebar_posts.html', context)
+        elif self.display_type == self.DISPLAY_HOT:
+            context = {
+                'posts': Post.hot_posts()
+            }
+            result = render_to_string('config/blocks/sidebar_posts.html', context)
+        elif self.display_type == self.DISPLAY_COMMENT:
+            context = {
+                'comments': Comment.objects.filter(status=Comment.STATUS_NORMAL)
+            }
+            result = render_to_string('config/blocks/sidebar_comments.html', context)
+        return result
