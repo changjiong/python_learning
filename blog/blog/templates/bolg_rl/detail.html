@@ -1,13 +1,8 @@
-<html lang="en">
+{% extends "./base.html" %}
+{% block title %} {{ post.title }} 
+{% endblock%}
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>小熊漫步 by Cjefai</title>
-</head>
-
-<body>
+{% block main %}
     {% if post %}
     <h1>{{ post.title }}</h1>
     <div>
@@ -18,13 +13,4 @@
     <hr />
     <p>{{ post.content }}</p>
     {% endif %}
-
-    <div>侧边栏展示：
-        {% for sidebar in sidebars %}
-        <h4>{{ sidebar.title }}</h4>
-        {{ sidebar.content_html }}
-        {% endfor %}
-    </div>
-</body>
-
-</html>
+{% endblock %}
